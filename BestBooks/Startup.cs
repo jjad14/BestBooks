@@ -13,6 +13,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 using BestBooks.DataAccess.Data;
+using BestBooks.DataAccess.Repository.IRepository;
+using BestBooks.DataAccess.Repository;
 
 namespace BestBooks
 {
@@ -30,9 +32,14 @@ namespace BestBooks
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
+
             services.AddRazorPages();
         }
 
