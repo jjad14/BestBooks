@@ -47,6 +47,28 @@ namespace BestBooks
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
             services.AddRazorPages();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = $"/Identity/Account/Login";
+                options.LogoutPath = $"/Identity/Account/Logout";
+                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+            });
+
+            // facebook authentication - appId and AppSecret found on fb dev app page
+            services.AddAuthentication().AddFacebook(opt =>
+            {
+                opt.AppId = "375606090415758";
+                opt.AppSecret = "ea128dc56b6b872d81c872142335464c";
+            });
+
+            // google authentication - appId and AppSecret found on google dev app page
+            services.AddAuthentication().AddGoogle(opt =>
+            {
+                opt.ClientId = "492806799469-fnoch2jod0s79nqq1a5g9l3qsumqg6ev.apps.googleusercontent.com";
+                opt.ClientSecret = "R5UUoQ2UQlTNLkRPQcAiNk2v";
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
