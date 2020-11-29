@@ -15,6 +15,8 @@ using Microsoft.Extensions.Hosting;
 using BestBooks.DataAccess.Data;
 using BestBooks.DataAccess.Repository.IRepository;
 using BestBooks.DataAccess.Repository;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using BestBooks.Utility;
 
 namespace BestBooks
 {
@@ -33,8 +35,12 @@ namespace BestBooks
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<IdentityUser>()
+            // AddDefaultIdentity does not have support for identity role.
+            // Using AddIdentity will also need AddDefaultTokenProviders
+            services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddSingleton<IEmailSender, EmailSender>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

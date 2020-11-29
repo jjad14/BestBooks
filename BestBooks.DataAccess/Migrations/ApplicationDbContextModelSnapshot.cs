@@ -33,6 +33,39 @@ namespace BestBooks.DataAccess.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("BestBooks.Models.Company", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("City")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("Province")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("StreetAddress")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<bool>("isAuthorizedCompany")
+                        .HasColumnType("tinyint(1)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Companies");
+                });
+
             modelBuilder.Entity("BestBooks.Models.CoverType", b =>
                 {
                     b.Property<int>("Id")
@@ -161,6 +194,10 @@ namespace BestBooks.DataAccess.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("longtext CHARACTER SET utf8mb4");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
                     b.Property<string>("Email")
                         .HasColumnType("varchar(256) CHARACTER SET utf8mb4")
                         .HasMaxLength(256);
@@ -211,6 +248,8 @@ namespace BestBooks.DataAccess.Migrations
                         .HasName("UserNameIndex");
 
                     b.ToTable("AspNetUsers");
+
+                    b.HasDiscriminator<string>("Discriminator").HasValue("IdentityUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -296,6 +335,34 @@ namespace BestBooks.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("BestBooks.Models.ApplicationUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<string>("City")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<int?>("CompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("PostalCode")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("Province")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.Property<string>("StreetAddress")
+                        .HasColumnType("longtext CHARACTER SET utf8mb4");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasDiscriminator().HasValue("ApplicationUser");
+                });
+
             modelBuilder.Entity("BestBooks.Models.Product", b =>
                 {
                     b.HasOne("BestBooks.Models.Category", "Category")
@@ -360,6 +427,13 @@ namespace BestBooks.DataAccess.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("BestBooks.Models.ApplicationUser", b =>
+                {
+                    b.HasOne("BestBooks.Models.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyId");
                 });
 #pragma warning restore 612, 618
         }
