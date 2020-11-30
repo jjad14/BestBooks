@@ -8,11 +8,14 @@ namespace BestBooks.DataAccess.Repository.IRepository
     // Controller -> UoW (repos and context) -> EF Core and Database
     public interface IUnitOfWork : IDisposable
     {
+        IApplicationUserRepository ApplicationUser { get;  }
         ICategoryRepository Category { get;  }
         ICoverTypeRepository CoverType { get;  }
         IProductRepository Product { get;  }
         ICompanyRepository Company { get;  }
-        IApplicationUserRepository ApplicationUser { get;  }
+        IShoppingCartRepository ShoppingCart { get;  }
+        IOrderHeaderRepository OrderHeader { get;  }
+        IOrderDetailsRepository OrderDetails { get;  }
         ISP_Call SP_Call { get; }
 
         void Save();
