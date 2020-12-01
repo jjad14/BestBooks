@@ -82,7 +82,7 @@ namespace BestBooks.Areas.Admin.Controllers
                 {
                     // all the file names for their images will have a new Guid
                     string fileName = Guid.NewGuid().ToString();
-                    //  navigate to the path of images and products
+                    // navigate to the path of images and products
                     // We combine the web root path with our folder
                     var uploads = Path.Combine(webRootPath, @"images\products");
                     // Get the file extension so that it will be the same
@@ -102,7 +102,7 @@ namespace BestBooks.Areas.Admin.Controllers
                     }
 
                     // After the file is deleted we will have to upload the new file
-                    using (var filesStreams = new FileStream(Path.Combine(uploads, fileName=extension), FileMode.Create))
+                    using (var filesStreams = new FileStream(Path.Combine(uploads, fileName+extension), FileMode.Create))
                     {
                         files[0].CopyTo(filesStreams);
                     }

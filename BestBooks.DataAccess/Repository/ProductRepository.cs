@@ -17,10 +17,10 @@ namespace BestBooks.DataAccess.Repository
             _db = db;
         }
 
-        // update a single category
+        // update a single product
         public void Update(Product product)
         {
-            // find category by id
+            // find product by id
             var objFromDb = _db.Products.FirstOrDefault(s => s.Id == product.Id);
 
             // if result is not null
