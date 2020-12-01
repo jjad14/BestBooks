@@ -71,6 +71,14 @@ namespace BestBooks
                 opt.ClientSecret = "R5UUoQ2UQlTNLkRPQcAiNk2v";
             });
 
+            // Session Configuration
+            services.AddSession(opt =>
+            {
+                opt.IdleTimeout = TimeSpan.FromMinutes(30);
+                opt.Cookie.HttpOnly = true;
+                opt.Cookie.IsEssential = true;
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -93,6 +101,8 @@ namespace BestBooks
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseSession();
 
             app.UseAuthentication();
 
