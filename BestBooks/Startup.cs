@@ -17,6 +17,7 @@ using BestBooks.DataAccess.Repository.IRepository;
 using BestBooks.DataAccess.Repository;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using BestBooks.Utility;
+using Stripe;
 
 namespace BestBooks
 {
@@ -43,6 +44,8 @@ namespace BestBooks
             services.AddSingleton<IEmailSender, EmailSender>();
 
             services.Configure<EmailOptions>(Configuration);
+
+            services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -101,6 +104,8 @@ namespace BestBooks
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            StripeConfiguration.ApiKey = Configuration.GetSection("Stripe")["SecretKey"];
 
             app.UseSession();
 

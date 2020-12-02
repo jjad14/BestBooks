@@ -92,7 +92,7 @@ namespace BestBooks.Areas.Identity.Pages.Account
 
                     int count = _unitOfWork.ShoppingCart.GetAll(u => u.ApplicationUserId == user.Id).Count();
                     // set the session
-                    HttpContext.Session.SetInt32(SD.ssShopingCart, count);
+                    HttpContext.Session.SetInt32(SD.ssShoppingCart, count);
 
                     _logger.LogInformation("User logged in.");
                     return LocalRedirect(returnUrl);

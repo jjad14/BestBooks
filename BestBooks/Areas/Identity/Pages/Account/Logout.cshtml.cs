@@ -31,7 +31,7 @@ namespace BestBooks.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             // set session - set cart to 0 on logout
-            HttpContext.Session.SetInt32(SD.ssShopingCart, 0);
+            HttpContext.Session.SetInt32(SD.ssShoppingCart, 0);
 
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");

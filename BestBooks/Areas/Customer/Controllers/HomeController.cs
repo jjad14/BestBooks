@@ -46,7 +46,7 @@ namespace BestBooks.Areas.Customer.Controllers
                     .Count();
 
                 // set the session
-                HttpContext.Session.SetInt32(SD.ssShopingCart, count);
+                HttpContext.Session.SetInt32(SD.ssShoppingCart, count);
             }
 
             return View(productList);
@@ -114,7 +114,7 @@ namespace BestBooks.Areas.Customer.Controllers
                 // HttpContext.Session.SetObject(SD.ssShopingCart, CartObj);
 
                 // alternative
-                HttpContext.Session.SetInt32(SD.ssShopingCart, count);
+                HttpContext.Session.SetInt32(SD.ssShoppingCart, count);
 
                 // get session obj
                 // var obj = HttpContext.Session.GetObject<ShoppingCart>(SD.ssShopingCart);
