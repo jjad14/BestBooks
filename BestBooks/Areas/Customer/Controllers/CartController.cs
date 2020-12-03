@@ -249,8 +249,6 @@ namespace BestBooks.Areas.Customer.Controllers
 
             _unitOfWork.Save();
 
-            List<OrderDetails> orderDetailsList = new List<OrderDetails>();
-
             // add items to db via OrderDetails
             foreach(var item in ShoppingCartVM.ListCart)
             {

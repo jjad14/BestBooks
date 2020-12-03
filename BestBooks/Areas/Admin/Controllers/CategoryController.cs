@@ -66,7 +66,8 @@ namespace BestBooks.Areas.Admin.Controllers
                 {
                     _unitOfWork.Category.Update(category);
                 }
-                    _unitOfWork.Save();
+                _unitOfWork.Save();
+
                 return RedirectToAction(nameof(Index)); // or RedirectToAction("Index");
             }
 
