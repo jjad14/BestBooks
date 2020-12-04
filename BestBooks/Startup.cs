@@ -18,6 +18,7 @@ using BestBooks.DataAccess.Repository;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using BestBooks.Utility;
 using Stripe;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
 namespace BestBooks
 {
@@ -43,9 +44,14 @@ namespace BestBooks
 
             services.AddSingleton<IEmailSender, EmailSender>();
 
+            // temp data allows us to hold a value for just one request
+            services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
+
             services.Configure<EmailOptions>(Configuration);
 
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
+
+            services.Configure<TwilioSettings>(Configuration.GetSection("Twilio"));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 

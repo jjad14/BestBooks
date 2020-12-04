@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BestBooks.DataAccess.Repository.IRepository;
 using BestBooks.Models;
+using BestBooks.Models.ViewModels;
 using BestBooks.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,12 +21,32 @@ namespace BestBooks.Areas.Admin.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index(int productPage = 1)
         {
-            return View();
+            CategoryVM categoryVM = new CategoryVM()
+            {
+                Categories = await _unitOfWork.Category.GetAllAsync()
+            };
+
+            var count = categoryVM.Categories.Count();
+
+            categoryVM.Categories = categoryVM.Categories.OrderBy(p => p.Name)
+                .Skip((productPage - 1) * 2)
+                .Take(2)
+                .ToList();
+
+            categoryVM.PagingInfo = new PagingInfo
+            {
+                CurrentPage = productPage,
+                ItemsPerPage = 2,
+                TotalItem = count,
+                urlParam = "/Admin/Category/Index?productPage=:"
+            };
+
+            return View(categoryVM);
         }        
         
-        public IActionResult Upsert(int? id)
+        public async Task<IActionResult> Upsert(int? id)
         {
 
             Category category = new Category();
@@ -37,7 +58,7 @@ namespace BestBooks.Areas.Admin.Controllers
             }
 
             // edit
-            category = _unitOfWork.Category.Get(id.GetValueOrDefault());
+            category = await _unitOfWork.Category.GetAsync(id.GetValueOrDefault());
             if (category == null)
             {
                 return NotFound();
@@ -54,14 +75,14 @@ namespace BestBooks.Areas.Admin.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Upsert(Category category)
+        public async Task<IActionResult> Upsert(Category category)
         {
             // if model validation is valid
             if (ModelState.IsValid)
             {
                 if (category.Id == 0)
                 {
-                    _unitOfWork.Category.Add(category);
+                    await _unitOfWork.Category.AddAsync(category);
                 } else
                 {
                     _unitOfWork.Category.Update(category);
@@ -89,28 +110,30 @@ namespace BestBooks.Areas.Admin.Controllers
         // ActionResult is an abstract class and ActionResults like view results partial view results, json results derive from the action result.
 
         [HttpGet]
-        public IActionResult GetAll() 
+        public async Task<IActionResult> GetAll() 
         {
             // retrieve all the categories
-            var allObj = _unitOfWork.Category.GetAll();
+            var allObj = await _unitOfWork.Category.GetAllAsync();
 
             //  return in a json format
             return Json(new { data = allObj });
         }
 
         [HttpDelete]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var objFromDb = _unitOfWork.Category.Get(id);
+            var objFromDb = await _unitOfWork.Category.GetAsync(id);
 
             if (objFromDb == null)
             {
+                TempData["Error"] = "Error deleting the Category";
                 return Json(new { success=false, message="Error while deleting"});
             }
 
-            _unitOfWork.Category.Remove(objFromDb);
+            await _unitOfWork.Category.RemoveAsync(objFromDb);
             _unitOfWork.Save();
 
+            TempData["Success"] = "Category Successfully deleted";
             return Json(new { success=true, message="Deleted Successfully"});
         }
 

@@ -105,6 +105,17 @@ namespace BestBooks.Areas.Identity.Pages.Account
                 })
             };
 
+            if(User.IsInRole(SD.Role_Employee))
+            {
+                Input.RoleList = _roleManager.Roles.Where(u => u.Name == SD.Role_User_Comp)
+                .Select(x => x.Name)
+                .Select(c => new SelectListItem
+                {
+                    Text = c,
+                    Value = c
+                });
+            }
+
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
         }
 
