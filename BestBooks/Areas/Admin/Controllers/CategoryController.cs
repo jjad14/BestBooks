@@ -126,15 +126,16 @@ namespace BestBooks.Areas.Admin.Controllers
 
             if (objFromDb == null)
             {
-                TempData["Error"] = "Error deleting the Category";
-                return Json(new { success=false, message="Error while deleting"});
+                // tempdata will hold a value for just one request
+                TempData["Error"] = "Error Deleting the Category";
+                return Json(new { success=false, message= "Error Deleting the Category" });
             }
 
             await _unitOfWork.Category.RemoveAsync(objFromDb);
             _unitOfWork.Save();
 
-            TempData["Success"] = "Category Successfully deleted";
-            return Json(new { success=true, message="Deleted Successfully"});
+            TempData["Success"] = "Category Successfully Deleted";
+            return Json(new { success=true, message= "Category Successfully Deleted" });
         }
 
         #endregion

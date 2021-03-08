@@ -15,8 +15,8 @@
                 {
                     <button type="submit" class="btn btn-block facebook-btn form-control"
                             name="provider" value="@provider.Name" title="Log in using your
-                                                    @provider.DisplayName account">
-                        <i class="fab fa-facebook-square"></i>&nbsp;@provider.DisplayName
+                                                            @provider.DisplayName account">
+                        <i class="fab fa-facebook-square"></i>&nbsp;&nbsp;@provider.DisplayName
                     </button>
 
                 }
@@ -26,8 +26,8 @@
                     {
                         <button type="submit" class="btn btn-block google-btn form-control"
                                 name="provider" value="@provider.Name" title="Log in using your
-                                                        @provider.DisplayName account">
-                            <i class="fab fa-google"></i>&nbsp;@provider.DisplayName
+                                                                        @provider.DisplayName account">
+                            <i class="fab fa-google"></i>&nbsp;&nbsp;@provider.DisplayName
                         </button>
 
                     }
@@ -46,25 +46,33 @@
     <form id="account" method="post">
         @if (Model.ExternalLogins?.Count > 0)
         {
+            <hr />
             <p style="text-align: center;">OR</p>
         }
 
         <input asp-for="Input.Email" placeholder="Email" type="email" class="mb-1 form-control" />
         <input asp-for="Input.Password" placeholder="Password" type="password" class="form-control" />
-        <button type="submit" class="btn btn-success btn-block"><i class="fa-facebook-square fa-sign-in-alt"></i>&nbsp;Sign In</button>
-
-
-        <!-- Center buttons below-->
-
-        <a id="forgot-password" asp-page="./ForgotPassword" class="pb-2 text-info">Forgot your password?</a>
-        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
-        <button type="submit" asp-page-handler="SendVerificationEmail" class="btn-link text-info" style="padding: 0px;border:0px">Resend email confirmation</button>
 
         <div asp-validation-summary="All" class="text-danger"></div>
 
-        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" 
-           class="btn btn-primary text-white">
-        <i class="fas fa-user-plus"></i>&nbsp;Register as a new user</a>
+        <button type="submit" class="btn btn-success btn-block">
+            <i class="fas fa-sign-in-alt"></i>&nbsp;&nbsp;Sign In
+        </button>
+
+        <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl"
+            class="btn btn-primary btn-block text-white">
+            <i class="fas fa-user-plus"></i>&nbsp;&nbsp;Register
+        </a>
+
+        <div class="col-12 d-flex align-items-center flex-column">
+            <a id="forgot-password" asp-page="./ForgotPassword" class="pb-2 text-info">Forgot your password?</a>
+            <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">Register as a new user</a>
+            <button type="submit" asp-page-handler="SendVerificationEmail" class="btn-link text-info" style="padding: 0px;border:0px">Resend email confirmation</button>
+
+        </div>
+
+
+
     </form>
 </div>
 
