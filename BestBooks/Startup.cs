@@ -34,6 +34,7 @@ namespace BestBooks
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // MySql database Connection
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
 
@@ -47,11 +48,12 @@ namespace BestBooks
             // temp data allows us to hold a value for just one request
             services.AddSingleton<ITempDataProvider, CookieTempDataProvider>();
 
+            // Third Party
             services.Configure<EmailOptions>(Configuration);
-
             services.Configure<StripeSettings>(Configuration.GetSection("Stripe"));
-
             services.Configure<TwilioSettings>(Configuration.GetSection("Twilio"));
+            services.Configure<FacebookSettings>(Configuration.GetSection("Facebook"));
+            services.Configure<GoogleSettings>(Configuration.GetSection("Google"));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -70,15 +72,15 @@ namespace BestBooks
             // facebook authentication - appId and AppSecret found on fb dev app page
             services.AddAuthentication().AddFacebook(opt =>
             {
-                opt.AppId = "375606090415758";
-                opt.AppSecret = "ea128dc56b6b872d81c872142335464c";
+                opt.AppId = Configuration.GetSection("Facebook")["AppId"];
+                opt.AppSecret = Configuration.GetSection("Facebook")["AppSecret"];
             });
 
             // google authentication - appId and AppSecret found on google dev app page
             services.AddAuthentication().AddGoogle(opt =>
             {
-                opt.ClientId = "492806799469-fnoch2jod0s79nqq1a5g9l3qsumqg6ev.apps.googleusercontent.com";
-                opt.ClientSecret = "R5UUoQ2UQlTNLkRPQcAiNk2v";
+                opt.ClientId = Configuration.GetSection("Google")["ClientId"];
+                opt.ClientSecret = Configuration.GetSection("Google")["ClientSecret"];
             });
 
             // Session Configuration
