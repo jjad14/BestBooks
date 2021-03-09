@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -10,6 +11,7 @@ using BestBooks.Models;
 using BestBooks.Utility;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +30,7 @@ namespace BestBooks.Areas.Identity.Pages.Account
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IWebHostEnvironment _hostEnvironment;
 
         private readonly IUnitOfWork _unitOfWork;
 
@@ -37,7 +40,8 @@ namespace BestBooks.Areas.Identity.Pages.Account
             RoleManager<IdentityRole> roleManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender,
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            IWebHostEnvironment hostEnvironment)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -45,6 +49,7 @@ namespace BestBooks.Areas.Identity.Pages.Account
             _logger = logger;
             _emailSender = emailSender;
             _unitOfWork = unitOfWork;
+            _hostEnvironment = hostEnvironment;
         }
 
         [BindProperty]
@@ -146,34 +151,13 @@ namespace BestBooks.Areas.Identity.Pages.Account
                 {
                     _logger.LogInformation("User created a new account with password.");
 
-                    // Check if roles exists
-                    if (!await _roleManager.RoleExistsAsync(SD.Role_Admin))
-                    {
-                        // create the admin role if it does not exist
-                        await _roleManager.CreateAsync(new IdentityRole(SD.Role_Admin));
-                    }                    
-                    if (!await _roleManager.RoleExistsAsync(SD.Role_Employee))
-                    {
-                        // create the employee role if it does not exist
-                        await _roleManager.CreateAsync(new IdentityRole(SD.Role_Employee));
-                    }
-                    if (!await _roleManager.RoleExistsAsync(SD.Role_User_Comp))
-                    {
-                        // create the company customer role if it does not exist
-                        await _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Comp));
-                    }
-                    if (!await _roleManager.RoleExistsAsync(SD.Role_User_Indi))
-                    {
-                        // create the individual customer role if it does not exist
-                        await _roleManager.CreateAsync(new IdentityRole(SD.Role_User_Indi));
-                    }
-
                     // if no role is selected (through regular registration)
                     if (user.Role == null)
                     {
                         // Role_User_Indi is the default role
                         await _userManager.AddToRoleAsync(user, SD.Role_User_Indi);
-                    } else
+                    } 
+                    else
                     {
                         // if a company is selected
                         if (user.CompanyId > 0)
@@ -186,15 +170,50 @@ namespace BestBooks.Areas.Identity.Pages.Account
                     }
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
                     var callbackUrl = Url.Page(
                         "/Account/ConfirmEmail",
                         pageHandler: null,
                         values: new { area = "Identity", userId = user.Id, code = code },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    // path to email template
+                    var PathToFile = _hostEnvironment.WebRootPath + Path.DirectorySeparatorChar.ToString()
+                        + "Templates" + Path.DirectorySeparatorChar.ToString()
+                        + "EmailTemplates" + Path.DirectorySeparatorChar.ToString()
+                        + "Confirm_Account_Registration.html";
+
+                    var subject = "Confirm Account Registration";
+                    
+                    // read html from template
+                    string htmlBody = "";
+                    using (StreamReader streamReader = System.IO.File.OpenText(PathToFile)) 
+                    {
+                        htmlBody = streamReader.ReadToEnd();
+                    }
+
+
+                    string message = $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.";
+
+                    // 0 Subject
+                    // 1 Date
+                    // 2 Name
+                    // 3 Email
+                    // 4 Message
+                    // 5 callbackHtml
+                    // Fill in blanks for template
+                    string messageBody = string.Format(htmlBody, 
+                        subject,
+                        String.Format("{0:dddd, d MMMM yyyy}", DateTime.Now),
+                        user.Name,
+                        user.Email,
+                        message,
+                        callbackUrl);
+
+                    // send email
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email", messageBody);
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {

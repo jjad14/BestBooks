@@ -43,6 +43,8 @@ namespace BestBooks
             services.AddIdentity<IdentityUser, IdentityRole>().AddDefaultTokenProviders()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
             services.AddSingleton<IEmailSender, EmailSender>();
 
             // temp data allows us to hold a value for just one request
@@ -54,8 +56,9 @@ namespace BestBooks
             services.Configure<TwilioSettings>(Configuration.GetSection("Twilio"));
             services.Configure<FacebookSettings>(Configuration.GetSection("Facebook"));
             services.Configure<GoogleSettings>(Configuration.GetSection("Google"));
+            services.Configure<BrainTreeSettings>(Configuration.GetSection("BrainTree"));
 
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddSingleton<IBrainTree, BrainTree>();
 
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
 

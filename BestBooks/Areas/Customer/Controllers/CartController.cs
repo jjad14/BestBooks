@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Stripe;
 using Twilio;
@@ -32,15 +33,20 @@ namespace BestBooks.Areas.Customer.Controllers
         [BindProperty]
         public ShoppingCartVM ShoppingCartVM { get; set; }
 
+        private readonly ILogger<CartController> _logger;
+
+
         public CartController(IUnitOfWork unitOfWork, 
                             IEmailSender emailSender, 
                             UserManager<IdentityUser> userManager,
-                            IOptions<TwilioSettings> twilioOptions)
+                            IOptions<TwilioSettings> twilioOptions,
+                            ILogger<CartController> logger)
         {
             _unitOfWork = unitOfWork;
             _emailSender = emailSender;
             _userManager = userManager;
             _twilioOptions = twilioOptions.Value;
+            _logger = logger;
         }
 
         public IActionResult Index()
@@ -350,7 +356,7 @@ namespace BestBooks.Areas.Customer.Controllers
             }
             catch(Exception ex)
             {
-                
+                _logger.LogError(ex.ToString());
             }
 
 
