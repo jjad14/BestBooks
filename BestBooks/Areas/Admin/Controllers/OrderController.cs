@@ -156,6 +156,40 @@ namespace BestBooks.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        public IActionResult UpdateOrderDetails() 
+        {
+            // get OrderHeader by Id
+            var orderHEaderFromDb = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == OrderVm.OrderHeader.Id);
+
+            // update all possible fields that might have been updated
+            orderHEaderFromDb.Name = OrderVm.OrderHeader.Name;
+            orderHEaderFromDb.PhoneNumber = OrderVm.OrderHeader.PhoneNumber;
+            orderHEaderFromDb.StreetAddress = OrderVm.OrderHeader.StreetAddress;
+            orderHEaderFromDb.City = OrderVm.OrderHeader.City;
+            orderHEaderFromDb.Province = OrderVm.OrderHeader.Province;
+            orderHEaderFromDb.PostalCode = OrderVm.OrderHeader.PostalCode;
+
+            // make sure carrier is not null
+            if (OrderVm.OrderHeader.Carrier != null)
+            {
+                orderHEaderFromDb.Carrier = OrderVm.OrderHeader.Carrier;
+            
+            }
+            
+            // make sure tracking number is not null
+            if (OrderVm.OrderHeader.TrackingNumber != null)
+            {
+                orderHEaderFromDb.TrackingNumber = OrderVm.OrderHeader.TrackingNumber;
+            }
+
+            // save changes
+            _unitOfWork.Save();
+
+            TempData["Success"] = "Order Details Updated Successfully.";
+            
+            return RedirectToAction("Details", "Order");
+        }
+
         #region API CALLS
 
         [HttpGet]
