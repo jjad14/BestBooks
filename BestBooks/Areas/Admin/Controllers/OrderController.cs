@@ -54,9 +54,10 @@ namespace BestBooks.Areas.Admin.Controllers
             OrderHeader orderHeader = _unitOfWork.OrderHeader
                 .GetFirstOrDefault(u => u.Id == OrderVm.OrderHeader.Id, includeProperties: "ApplicationUser");
 
+            // stripe token exists
             if (stripeToken != null)
             {
-                // process the payment
+                // process payment
                 var options = new ChargeCreateOptions
                 {
                     Amount = Convert.ToInt32(orderHeader.OrderTotal * 100),
@@ -70,13 +71,13 @@ namespace BestBooks.Areas.Admin.Controllers
                 Charge charge = service.Create(options);
 
                 // BalanceTransactionId is returned once a transaction is made.
-                if (charge.BalanceTransactionId == null)
+                if (charge.Id == null)
                 {
                     orderHeader.PaymentStatus = SD.PaymentStatusRejected;
                 }
                 else
                 {
-                    orderHeader.TransactionId = charge.BalanceTransactionId;
+                    orderHeader.TransactionId = charge.Id;
                 }
 
                 // status of the charge
@@ -159,35 +160,35 @@ namespace BestBooks.Areas.Admin.Controllers
         public IActionResult UpdateOrderDetails() 
         {
             // get OrderHeader by Id
-            var orderHEaderFromDb = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == OrderVm.OrderHeader.Id);
+            var orderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == OrderVm.OrderHeader.Id);
 
             // update all possible fields that might have been updated
-            orderHEaderFromDb.Name = OrderVm.OrderHeader.Name;
-            orderHEaderFromDb.PhoneNumber = OrderVm.OrderHeader.PhoneNumber;
-            orderHEaderFromDb.StreetAddress = OrderVm.OrderHeader.StreetAddress;
-            orderHEaderFromDb.City = OrderVm.OrderHeader.City;
-            orderHEaderFromDb.Province = OrderVm.OrderHeader.Province;
-            orderHEaderFromDb.PostalCode = OrderVm.OrderHeader.PostalCode;
+            orderHeader.Name = OrderVm.OrderHeader.Name;
+            orderHeader.PhoneNumber = OrderVm.OrderHeader.PhoneNumber;
+            orderHeader.StreetAddress = OrderVm.OrderHeader.StreetAddress;
+            orderHeader.City = OrderVm.OrderHeader.City;
+            orderHeader.Province = OrderVm.OrderHeader.Province;
+            orderHeader.PostalCode = OrderVm.OrderHeader.PostalCode;
 
             // make sure carrier is not null
             if (OrderVm.OrderHeader.Carrier != null)
             {
-                orderHEaderFromDb.Carrier = OrderVm.OrderHeader.Carrier;
+                orderHeader.Carrier = OrderVm.OrderHeader.Carrier;
             
             }
             
             // make sure tracking number is not null
             if (OrderVm.OrderHeader.TrackingNumber != null)
             {
-                orderHEaderFromDb.TrackingNumber = OrderVm.OrderHeader.TrackingNumber;
+                orderHeader.TrackingNumber = OrderVm.OrderHeader.TrackingNumber;
             }
 
             // save changes
             _unitOfWork.Save();
 
             TempData["Success"] = "Order Details Updated Successfully.";
-            
-            return RedirectToAction("Details", "Order");
+
+            return RedirectToAction("Details", "Order", new { id = orderHeader.Id });
         }
 
         #region API CALLS

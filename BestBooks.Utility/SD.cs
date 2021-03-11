@@ -34,8 +34,6 @@ namespace BestBooks.Utility
         public const string PaymentStatusDelayedPayment = "ApprovedForDelayedPayment";
         public const string PaymentStatusRejected = "Rejected";
 
-
-
         // calculate price based on the quantity
         public static double GetPriceBasedOnQuantity(double quantity, double price, double price50, double price100)
         {

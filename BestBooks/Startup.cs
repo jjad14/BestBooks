@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using BestBooks.Utility;
 using Stripe;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using BestBooks.DataAccess.DbInitializer;
 
 namespace BestBooks
 {
@@ -44,6 +45,9 @@ namespace BestBooks
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // initialize database
+            services.AddScoped<IDbInitializer, DbInitializer>();
 
             services.AddSingleton<IEmailSender, EmailSender>();
 
@@ -97,7 +101,7 @@ namespace BestBooks
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IDbInitializer dbInitializer)
         {
             if (env.IsDevelopment())
             {
@@ -124,6 +128,9 @@ namespace BestBooks
             app.UseAuthentication();
 
             app.UseAuthorization();
+
+            // initalize database
+            dbInitializer.InitalizeDb();
 
             app.UseEndpoints(endpoints =>
             {

@@ -14,7 +14,7 @@
                     <i class="fas fa-shopping-cart"></i> &nbsp; Order Summary
                 </div>
                 <div class="col-12 col-md-4 offset-md-2 text-right">
-                    <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-outline-info form-control btn-sm">Back to Orders</a>
+                    <a asp-area="Admin" asp-controller="Order" asp-action="Index" class="btn btn-info form-control btn-sm">Back to Orders</a>
                 </div>
             </div>
             <div class="card-body">
@@ -259,7 +259,7 @@
                             }
 
                             @if (Model.OrderHeader.PaymentStatus == SD.PaymentStatusDelayedPayment &&
-                               Model.OrderHeader.OrderStatus == SD.StatusShipped)
+                              Model.OrderHeader.OrderStatus == SD.StatusShipped)
                             {
                                 <script src="https://checkout.stripe.com/checkout.js"
                                         class="stripe-button"
@@ -279,8 +279,8 @@
                             }
 
                             @if (Model.OrderHeader.OrderStatus != SD.StatusRefunded &&
-                           Model.OrderHeader.OrderStatus != SD.StatusCancelled &&
-                           (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee)))
+                          Model.OrderHeader.OrderStatus != SD.StatusCancelled &&
+                          (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee)))
                             {
                                 <div class="pt-2">
                                     <a asp-action="CancelOrder" asp-route-id="@Model.OrderHeader.Id"
@@ -289,6 +289,7 @@
                                     </a>
                                 </div>
                             }
+
                         </div>
                     </div>
                 </div>

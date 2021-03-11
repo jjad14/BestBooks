@@ -291,10 +291,10 @@ namespace BestBooks.Areas.Customer.Controllers
             // update the session
             HttpContext.Session.SetInt32(SD.ssShoppingCart, 0);
 
-            // token received from stripe
+            // token received from stripe is null
             if(stripeToken == null)
             {
-                // authorized user who is placing an order and they can make the payment later on.
+                // authorized user who is placing an order and can make the payment later on.
                 // order will be created for delayed payment for authorized company
                 ShoppingCartVM.OrderHeader.PaymentDueDate = DateTime.Now.AddDays(30);
                 ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
@@ -302,7 +302,7 @@ namespace BestBooks.Areas.Customer.Controllers
             }
             else
             {
-                // process the payment
+                // process the payment via stripe
                 var options = new ChargeCreateOptions
                 {
                     Amount = Convert.ToInt32(ShoppingCartVM.OrderHeader.OrderTotal * 100),
@@ -312,22 +312,24 @@ namespace BestBooks.Areas.Customer.Controllers
                 };
 
                 var service = new ChargeService();
+
                 // This will make the call to create the transaction on the credit card
                 Charge charge = service.Create(options);
 
                 // BalanceTransactionId is returned once a transaction is made.
-                if (charge.BalanceTransactionId == null)
+                if (charge.Id == null)
                 {
                     ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusRejected;
                 }
                 else
                 {
-                    ShoppingCartVM.OrderHeader.TransactionId = charge.BalanceTransactionId;
+                    ShoppingCartVM.OrderHeader.TransactionId = charge.Id;
                 }
 
                 // status of the charge
-                if(charge.Status.ToLower() =="succeded")
+                if(charge.Status.ToLower() =="succeeded")
                 {
+                    // TODO: ITS NOT CHANGING THE ORDER STATUS
                     ShoppingCartVM.OrderHeader.PaymentStatus = SD.PaymentStatusApproved;
                     ShoppingCartVM.OrderHeader.OrderStatus = SD.StatusApproved;
                     ShoppingCartVM.OrderHeader.PaymentDate = DateTime.Now;
@@ -342,8 +344,10 @@ namespace BestBooks.Areas.Customer.Controllers
 
         public IActionResult OrderConfirmation(int id)
         {
+            // get order number
             OrderHeader orderHeader = _unitOfWork.OrderHeader.GetFirstOrDefault(u => u.Id == id);
 
+            // initialize twilio client
             TwilioClient.Init(_twilioOptions.AccountSid, _twilioOptions.AuthToken);
 
             try

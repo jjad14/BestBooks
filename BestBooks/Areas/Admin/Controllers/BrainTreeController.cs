@@ -20,6 +20,7 @@ namespace BestBooks.Areas.Admin.Controllers
         public BrainTreeController(IBrainTree brainTree, ILogger<BrainTreeController> logger)
         {
             BrainTree = brainTree;
+            _logger = logger;
         }
 
         public IActionResult Index()
